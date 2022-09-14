@@ -14,19 +14,19 @@ const Cart = () => {
   const cartData = [
     {
       S3image: cart1,
-      name: 'butterscotch ice-cream',
+      name: 'Gucci Shoe',
       quantity: '10',
       price: '250',
     },
     {
       S3image: cart2,
-      name: 'Supreme fresh tomato',
+      name: 'Nike Shirt',
       quantity: '26',
       price: '450',
     },
     {
       S3image: cart3,
-      name: 'Red color candy',
+      name: 'Nike Shoe',
       quantity: '12',
       price: '190',
     },
