@@ -51,9 +51,7 @@ const Cart = () => {
         </div>
         {cartData?.map((item, index) => (
           <div key={index}>
-            <div key={index}>
               <CartItem item={item} />
-            </div>
           </div>
         ))}
        
