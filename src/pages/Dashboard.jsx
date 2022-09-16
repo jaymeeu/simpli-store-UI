@@ -4,8 +4,11 @@ import { useNavigate } from 'react-router-dom'
 import { PriceFormatter } from '../utils/PriceFormatter'
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
+import { useAuthContext } from '../contexts/AuthContext';
 
 const Dashboard = () => {
+
+  const { dbUser } = useAuthContext()
 
   const [items_list, setItems_list] = useState(null)
   const navigate = useNavigate()
@@ -18,10 +21,14 @@ const Dashboard = () => {
    
   }
 
-  
-
   return (
     <div>
+      {
+        dbUser === undefined && <UpdateUser
+          showClose={false}
+        // close={refreshUserAfterUpdate}
+        />
+      }
      
       <div className="m-5 md:m-10 mt-24 p-1 md:p-10 bg-white rounded-3xl">
 

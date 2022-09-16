@@ -5,6 +5,7 @@ import  Button  from './Button';
 import { useStateContext } from '../contexts/ContextProvider';
 import avatar from '../assets/avatar.webp';
 import { useNavigate } from 'react-router-dom';
+import {Auth} from 'aws-amplify'
 
 const UserProfile = () => {
   const { handleClick } = useStateContext();
@@ -50,6 +51,7 @@ const UserProfile = () => {
           onClick={() => {
             handleClick('userProfile')
             navigate('/');
+            Auth.signOut()
           }}
         />
       </div>

@@ -1,32 +1,64 @@
 import React, { useState } from 'react';
 import { MdOutlineCancel } from 'react-icons/md';
+import { useAuthContext } from '../contexts/AuthContext';
+import { User } from "./../models";
+import {DataStore} from 'aws-amplify'
 import Button from './Button';
 
 import Input, { Select, Textarea } from './Input';
 import { useEffect } from 'react';
 
 const UpdateUser = ({ close, showClose }) => {
+    const { dbUser, setDbuser, sub, authUser} = useAuthContext()
 
-    const [name, setName] = useState('')
-    const [email, setEmail] = useState('')
-    const [description, setdescription] = useState('')
-    const [storeName, setStoreName] = useState('')
-    const [role, setRole] = useState('')
+    const [name, setName] = useState(dbUser?.name || '')
+    const [email, setEmail] = useState(authUser?.attributes?.email)
+    const [description, setdescription] = useState(dbUser?.description || '')
+    const [storeName, setStoreName] = useState(dbUser?.storeName || '')
+    const [role, setRole] = useState(dbUser?.role || '')
 
+    useEffect(() => {
+        setEmail(authUser?.attributes?.email)
+
+        console.log(authUser,"authUser")
+    }, [authUser])
+
+    // create new user
     const createUser = () => {
-       
+        DataStore.save(new User({ name, description, rating: parseFloat('2.5'), sub, role, storeName, email : authUser?.attributes?.email }))
+          .then((res) => {
+            setDbuser(res)
+          })
+          .catch((err) => {
+            console.log("error", err)
+          })
       }
     
       //update user
       const updateUser = () => {
-        
+        DataStore.save(
+          User.copyOf(dbUser, (updated) => {
+            updated.name = name
+            updated.description = description
+          }))
+          .then((res) => {
+            setDbuser(res)
+          })
+          .catch((err) => {
+            console.log("error", err)
+          })
       }
 
     const handleUpdateUser = (e) => {
         //call close function on successfull update
         e.preventDefault();
 
-       
+        if (dbUser) {
+          updateUser()
+        }
+        else {
+          createUser()
+        }
     }
 
     return (
@@ -74,7 +106,10 @@ const UpdateUser = ({ close, showClose }) => {
                             isRequired={true}
                             placeholder='Email'
                         />
-                       
+                        {
+                            dbUser?.sub ? 
+                            <></>
+                            :
                             <Select
                             options={
                                 [
@@ -84,9 +119,14 @@ const UpdateUser = ({ close, showClose }) => {
                                 ]
                             }
                             handleChange={(e) => setRole(e.target.value)}
-                            value={role}/>
-                      
-                        
+                            value={role}
+                        />
+
+                        }
+                       
+                        {
+                            role === 'seller' &&
+                            <>
                                 <Input
                                     handleChange={(e) => setStoreName(e.target.value)}
                                     value={storeName}
@@ -111,9 +151,8 @@ const UpdateUser = ({ close, showClose }) => {
                                     isRequired={true}
                                     placeholder='Description'
                                 />
-                         
-
-
+                            </>
+                        }
 
                         <Button
                             color="white"
