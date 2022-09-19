@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import UpdateUser from '../components/UpdateUser'
 import { useNavigate } from 'react-router-dom'
 import { PriceFormatter } from '../utils/PriceFormatter'
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
+
 import { useAuthContext } from '../contexts/AuthContext';
+import UpdateUser from '../components/UpdateUser'
+
 
 const Dashboard = () => {
 
@@ -21,12 +23,12 @@ const Dashboard = () => {
    
   }
 
+
   return (
     <div>
       {
         dbUser === undefined && <UpdateUser
           showClose={false}
-        // close={refreshUserAfterUpdate}
         />
       }
      

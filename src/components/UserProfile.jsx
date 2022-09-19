@@ -5,10 +5,13 @@ import  Button  from './Button';
 import { useStateContext } from '../contexts/ContextProvider';
 import avatar from '../assets/avatar.webp';
 import { useNavigate } from 'react-router-dom';
-import {Auth} from 'aws-amplify'
+import { useAuthContext } from '../contexts/AuthContext';
+import { Auth} from 'aws-amplify'
 
 const UserProfile = () => {
   const { handleClick } = useStateContext();
+
+  const  {dbUser} = useAuthContext()
 
   const navigate = useNavigate();
 
@@ -35,9 +38,9 @@ const UserProfile = () => {
           alt="user-profile"
         />
         <div>
-          <p className="font-semibold text-xl dark:text-gray-200"> name </p>
-          <p className="text-gray-500 text-sm dark:text-gray-400">  role  </p>
-          <p className="text-gray-500 text-sm font-semibold dark:text-gray-400"> email </p>
+          <p className="font-semibold text-xl dark:text-gray-200"> {dbUser?.name} </p>
+          <p className="text-gray-500 text-sm dark:text-gray-400">  {dbUser?.role}   </p>
+          <p className="text-gray-500 text-sm font-semibold dark:text-gray-400"> {dbUser?.email} </p>
         </div>
       </div>
       

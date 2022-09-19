@@ -6,10 +6,12 @@ import { MdKeyboardArrowDown } from 'react-icons/md';
 import avatar from '../assets/avatar.webp';
 import Cart from '../components/Cart';
 import UserProfile from '../components/UserProfile'
-import { useStateContext } from '../contexts/ContextProvider';
 
+import { useStateContext } from '../contexts/ContextProvider';
+import { useAuthContext } from '../contexts/AuthContext';
 
 const Navbar = () => {
+  const  {dbUser} = useAuthContext()
 
 
     const NavButton = ({ customFunc, icon, color, dotColor }) => (
@@ -54,7 +56,7 @@ const Navbar = () => {
                     <p>
                         <span className="text-gray-400 text-14">Hello,</span>{' '}
                         <span className="text-gray-400 font-bold ml-1 text-14">
-                            name
+                            {dbUser?.name.split(" ")[0]}
                         </span>
                     </p>
                     <MdKeyboardArrowDown className="text-gray-400 text-14" />

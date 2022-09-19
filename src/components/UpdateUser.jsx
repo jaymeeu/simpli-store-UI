@@ -34,6 +34,7 @@ const UpdateUser = ({ close, showClose }) => {
         }))          
 .then((res) => {
             setDbuser(res)
+            close()
           })
           .catch((err) => {
             console.log("error", err)
@@ -44,11 +45,12 @@ const UpdateUser = ({ close, showClose }) => {
       const updateUser = () => {
         DataStore.save(
           User.copyOf(dbUser, (updated) => {
-            updated.name = name
+            updated.storeName = storeName
             updated.description = description
           }))
           .then((res) => {
             setDbuser(res)
+            close()
           })
           .catch((err) => {
             console.log("error", err)
@@ -94,6 +96,7 @@ const UpdateUser = ({ close, showClose }) => {
                             name="name"
                             type="text"
                             isRequired={true}
+                            disabled={true}
                             placeholder='Fullname'
                         />
                         <Input
