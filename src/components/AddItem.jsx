@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { FiPlus } from 'react-icons/fi';
 import { MdOutlineCancel } from 'react-icons/md';
+import { Item } from '../models';
+import { DataStore, Storage } from 'aws-amplify';
 
 import Button from './Button';
 import IconButton from './IconButton/IconButton';
 
 import Input, { Textarea } from './Input';
+import { useAuthContext } from '../contexts/AuthContext';
 
 const AddItem = ({ close }) => {
 
@@ -17,6 +20,7 @@ const AddItem = ({ close }) => {
     const [price, setPrice] = useState('')
     const [qty, setQty] = useState('')
 
+    const { sub } = useAuthContext()
 
     const re = /^[0-9\b]+$/;
     const changeQty = (e) => {
@@ -42,11 +46,31 @@ const AddItem = ({ close }) => {
         setimage(my_image)
     }
 
-    
+    function makeid(length) {
+        var result = '';
+        var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        var charactersLength = characters.length;
+        for (var i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() *
+                charactersLength));
+        }
+        return result;
+    }
 
     const handleAddItem = async () => {
 
-       
+        const fileName = makeid(20);
+        
+        await Storage.put(fileName, imagetosend);
+
+        await DataStore.save(new Item({ name, description, price: parseFloat(price), quantity: parseInt(qty), image: fileName, userID: sub }))
+            .then((res) => {
+                console.log(res, "resresres")
+                close()
+            })
+            .catch((err) => {
+                console.log(err, "errerrerr")
+            })
     }
 
     return (

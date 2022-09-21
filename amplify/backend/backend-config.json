@@ -47,5 +47,12 @@
         }
       }
     }
+  },
+  "storage": {
+    "s3simplistorev2storage90acd80d": {
+      "service": "S3",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": []
+    }
   }
 }

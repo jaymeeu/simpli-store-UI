@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react'
+import UpdateUser from '../components/UpdateUser'
+import { useAuthContext } from '../contexts/AuthContext'
+import { DataStore, Storage } from 'aws-amplify'
+import { Item } from '../models'
 import { useNavigate } from 'react-router-dom'
 import { PriceFormatter } from '../utils/PriceFormatter'
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 
-import { useAuthContext } from '../contexts/AuthContext';
-import UpdateUser from '../components/UpdateUser'
-
-
 const Dashboard = () => {
 
   const { dbUser } = useAuthContext()
-
+  
   const [items_list, setItems_list] = useState(null)
   const navigate = useNavigate()
 
@@ -20,9 +20,21 @@ const Dashboard = () => {
   }, [])
 
   const getAllItems = async () => {
-   
+    const allItems = await (await DataStore.query(Item)).sort((x, y) => new Date(y.createdAt) - new Date(x.createdAt))
+
+    // console.log(allItems,"all itemsss")
+    const products = await Promise.all(JSON.parse(JSON.stringify(allItems)).map(async product => {
+      const image = await Storage.get(product.image)
+      product.S3image = image
+      return product
+    })
+    )
+    setItems_list(products)
   }
 
+  if (!items_list) {
+    return <>Loading....</>
+  }
 
   return (
     <div>
@@ -31,7 +43,6 @@ const Dashboard = () => {
           showClose={false}
         />
       }
-     
       <div className="m-5 md:m-10 mt-24 p-1 md:p-10 bg-white rounded-3xl">
 
         <div className="bg-white">
@@ -64,18 +75,15 @@ const Dashboard = () => {
                       <h3 className="text-sm text-gray-700">
                         {product?.name}
                       </h3>
-                      {/* <p className="mt-1 text-sm text-gray-500">{product.color}</p> */}
                     </div>
                     <p className="text-sm font-medium text-gray-900">&#8358;{PriceFormatter(product?.price)}</p>
                   </div>
-
                 </div>
               ))}
             </div>
           </div>
         </div>
       </div>
-
     </div>
   )
 }

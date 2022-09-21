@@ -32,7 +32,7 @@ const UpdateUser = ({ close, showClose }) => {
             storeName, 
             email : authUser?.attributes?.email 
         }))          
-.then((res) => {
+        .then((res) => {
             setDbuser(res)
             close()
           })

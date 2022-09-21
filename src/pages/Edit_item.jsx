@@ -6,9 +6,14 @@ import { useNavigate, useParams } from 'react-router-dom'
 import Button from '../components/Button'
 import IconButton from '../components/IconButton/IconButton'
 import Input, { Textarea } from '../components/Input'
+import {DataStore, Storage} from 'aws-amplify'
+import { Item } from '../models'
+import { useAuthContext } from '../contexts/AuthContext'
 
 const Edit_item = () => {
 
+    const {id} = useParams();
+    const {sub} = useAuthContext();
 const navigate  = useNavigate()
     const [item, setItem] = useState(null)
 
@@ -36,15 +41,22 @@ const navigate  = useNavigate()
       const [defaultimage, setdefaultimage] = useState('')
     
       const getItem = async () => {
+        const itemInfo = await DataStore.query(Item, (item)=> item.id('eq', id) && item.userID('eq', sub))
+        setItem(itemInfo[0])
+        // console.log(itemInfo[0])
+          const image = await Storage.get(itemInfo[0].image)
+          setimage(image)
+        setdefaultimage(image)
 
       }
 
 
     useEffect(() => {
-        setName("Nike shoe")
-        setdescription("the best shoe")
-        setPrice("2100")
-        setQty("10")
+        setName(item?.name)
+        setdescription(item?.description)
+        setPrice(item?.price)
+        setQty(item?.quantity)
+        setimg_ref(item?.image)
     }, [item])
     
     
@@ -74,10 +86,30 @@ const navigate  = useNavigate()
     }
 
     const handleUpdateItem = async () =>{
-       
+        if(defaultimage !== image && imagetosend.length === 1){
+            console.log(img_ref,"hghhhh")
+            await Storage.put(img_ref, imagetosend[0]);
+        }
+        DataStore.save(
+            Item.copyOf(item, (update) => {
+              update.name = name
+              update.description = description
+              update.price = parseFloat(price)
+              update.quantity = parseInt(qty)
+            //   update.image = image
+            }))
+            .then((res) => {
+              console.log(res)
+              navigate(-1)
+            })
+            .catch((err) => {
+              console.log("error", err)
+            })
     }
 
-   
+    if(!item){
+        return <>Loading...</>
+    }
 
     return (
         <div className="m-5 md:m-10 mt-24 p-1 md:p-10 bg-white rounded-3xl">

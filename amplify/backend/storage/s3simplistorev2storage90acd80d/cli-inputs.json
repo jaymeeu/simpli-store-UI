@@ -1,0 +1,14 @@
+{
+  "resourceName": "s3simplistorev2storage90acd80d",
+  "bucketName": "simpli-store-v2-storage-90acd80d",
+  "policyUUID": "dca215ce",
+  "storageAccess": "authAndGuest",
+  "guestAccess": [
+    "READ"
+  ],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ]
+}

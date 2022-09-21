@@ -1,6 +1,9 @@
 import React, {useState, useEffect} from 'react'
 import { AiOutlinePlus } from 'react-icons/ai'
 import AddItem from '../components/AddItem'
+import { Storage, DataStore } from 'aws-amplify';
+import {Item} from './../models';
+import { useAuthContext } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { PriceFormatter } from '../utils/PriceFormatter';
 import Button from '../components/Button';
@@ -10,18 +13,11 @@ import 'react-lazy-load-image-component/src/effects/blur.css';
 
 const Shop = () => {
 
+  const {sub} = useAuthContext()
+
   const [items_list, setItems_list] = useState(null)
 
   const [refresh, setrefresh] = useState(false);
-
-  // useEffect(() => {
-  //   DataStore.query(Item, (item)=> item.userID('eq', sub)).then((res)=>{
-  //     setItems_list(res.sort((a,b)=> new Date(b?.createdAt) - new Date(a?.createdAt)))
-  //   })
-    
-  // }, [refresh])
-
- 
 
   useEffect(() => {
     getAllItems()
@@ -31,6 +27,14 @@ const Shop = () => {
 
   const getAllItems = async () => {
 
+    const allItems = await (await DataStore.query(Item, (item)=> item.userID('eq', sub))).sort((x, y) => new Date(y.createdAt) - new Date(x.createdAt))
+    const products = await Promise.all(JSON.parse(JSON.stringify(allItems)).map(async product => {
+      const image = await Storage.get(product.image)
+      product.S3image = image
+      return product
+    }))
+
+    setItems_list(products)
   }
 
   const refetch = () =>{
@@ -40,6 +44,10 @@ const Shop = () => {
   const navigate = useNavigate()
   
   const [showAdd, setshowAdd] = useState(false)
+
+  if(!items_list){
+    return <>Loading....</>
+  }
 
   return (
     <div>
