@@ -2,10 +2,15 @@ import React, { useState } from 'react'
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 import { PriceFormatter } from "../utils/PriceFormatter";
 import Button from "../components/Button";
+import { Cart, Item, Order } from '../models';
+import { useAuthContext } from '../contexts/AuthContext';
+import { DataStore } from 'aws-amplify';
 
 const CartItem = ({ item, onsuccess }) => {
-
     // const [qty_available, setqty_available] = useState(parseInt(item.quantity))
+
+    const { sub } = useAuthContext()
+
     const [qty, setqty] = useState(1)
     const [total, settotal] = useState(parseFloat(item.price))
 
@@ -31,7 +36,44 @@ const CartItem = ({ item, onsuccess }) => {
         // on order add, delete item from cart
         // on delete from cart successfull reduce the quantity of item in Item table
 
-       
+        await DataStore.save(new Order({
+            buyer_id: sub,
+            seller_id: item.userID,
+            price: parseFloat(price),
+            quantity : parseInt(qty),
+            total: parseFloat(total),
+            name: item.name,
+            image: item.image,
+            item_id: item.id
+        }))
+            .then(async (res) => {
+                const todelete = await DataStore.query(Cart, item.cartID);
+                DataStore.delete(todelete)
+                    .then(async (res) => {
+                        console.log(res, "delete response")
+
+                        const itemToUpdate = await DataStore.query(Item, item.id);
+                        DataStore.save(
+                            Item.copyOf(itemToUpdate, (update) => {
+                                update.quantity = parseInt(qty_available) - parseInt(qty)
+                            }))
+                            .then(async (res) => { 
+                                console.log(res, "update response")
+                                onsuccess()
+                            })
+                            .catch((err) => {
+                                console.log(err, "update errerrerr")
+                            })
+
+                    })
+                    .catch((err) => {
+                        console.log(err, "delete err")
+                    })
+            })
+            .catch((err) => {
+                console.log(err, "add errerrerr")
+            })
+
     }
 
     return (
