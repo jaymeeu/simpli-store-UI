@@ -96,7 +96,6 @@ const UpdateUser = ({ close, showClose }) => {
                             name="name"
                             type="text"
                             isRequired={true}
-                            disabled={true}
                             placeholder='Fullname'
                         />
                         <Input
