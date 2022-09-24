@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from 'react'
+import { useAuthContext } from '../contexts/AuthContext'
+import { Order } from '../models'
+import { DataStore, Storage } from 'aws-amplify'
 import OrdersItem from '../components/OrdersItem'
 
 const SellerOrder = () => {
-
+    const { sub } = useAuthContext()
+    
     const [order_list, setorder_list] = useState(null)
 
     useEffect(() => {
@@ -10,8 +14,22 @@ const SellerOrder = () => {
     }, [])
 
     const getOrders = async () =>{
-      
+        const myOrders =  (await DataStore.query(Order, (item) => item.seller_id('eq', sub))).sort((x, y) => new Date(y.createdAt) - new Date(x.createdAt))
+
+        const fetchOrdersImage = await Promise.all(
+            JSON.parse(JSON.stringify(myOrders))
+            .map(async order => {
+                const image = await Storage.get(order.image)
+                order.S3image = image
+            return order
+        }))
+
+        setorder_list(fetchOrdersImage)
         
+    }
+    
+    if(!order_list){
+        return <>Loading...</>
     }
     
    
